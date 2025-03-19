@@ -1,0 +1,72 @@
+\documentclass[12pt,twoside]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\graphicspath{{./images/}}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage[a4paper,width=150mm,top=25mm,bottom=25mm,bindingoffset=6mm]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{plain}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead{}
+\fancyfoot{}
+\fancyfoot[C]{\thepage}
+
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{mathtools}
+\usepackage[
+    backend=biber,
+    style=numeric,
+    backref=true,
+    sorting=none
+    ]{biblatex}
+\usepackage{tocbibind}
+
+\title{
+  {Privacy Enhanced RAG for LLMs in Healthcare}\\
+  {\large National University of Singapore}\\
+}
+\author{Bryan Ha Wai Kit}
+\date{2025}
+
+
+\bibliography{references.bib}
+
+\begin{document}
+\pagenumbering{roman}
+\maketitle
+\input{chapters/abstract.tex}
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+\newpage
+\pagenumbering{arabic}
+\input{chapters/intro.tex}
+\input{chapters/review.tex}
+\input{chapters/methodology.tex}
+
+
+\section{Moving Forward}
+
+With the RAG corpus built, and the abilities of the LLM confirmed, the next steps are as follows:
+\begin{itemize}
+	\item Evaluate LLM's ability to extract relevant information from retrieved chunks
+	\item Create a pipeline that connects the retrieval, synthesis and inference stages
+	\item Compare LLM's responses when presented with the original and synthesized information
+	\item Test the system through prompt attacks (information-query attacks)
+\end{itemize}
+
+
+\printbibliography[title=References]
+\nocite{*}
+\break
+
+\appendix
+\section{Appendix}
+\input{chapters/appendix.tex}
+\end{document}

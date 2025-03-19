@@ -1,0 +1,12 @@
+\thispagestyle{plain}
+
+\begin{abstract}
+	\addcontentsline{toc}{chapter}{Abstract}
+	Large Language Models (LLMs) are increasingly utilized in healthcare for tasks such as clinical note summarization and medical report generation.
+	However, their reliance on proprietary and sensitive patient data introduces significant privacy risks, particularly when using Retrieval-Augmented Generation (RAG).
+	This project proposes a privacy-focused framework that leverages synthetic document generation to mitigate these risks while maintaining response accuracy.
+
+	The proposed system follows an agent-based approach, incorporating three key agents: a Search Agent, a Synthesis Agent, and a Review Agent. The process begins with the Search Agent retrieving relevant vector-related text nodes from a vector database. The Synthesis Agent then evaluates the extracted content, filtering and retaining only the necessary information for query responses while removing personally identifiable information (PII). Finally, the Review Agent verifies and refines the synthesized document to ensure privacy compliance before passing it to the LLM.
+
+	This thesis evaluates the effectiveness of synthetic document generation in mitigating privacy risks while preserving contextual relevance. Through a series of experiments, the system's ability to reduce PII leakage, maintain medical accuracy, and withstand adversarial attacks is assessed. The findings provide insights into balancing privacy and utility in healthcare-focused LLM applications.
+\end{abstract}
