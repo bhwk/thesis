@@ -12,10 +12,10 @@
     {
       packages.${system}.default = pkgs.writeShellScriptBin "compile" ''
         mkdir -p out
-        pdflatex report.tex
+        xelatex report.tex
         biber report
-        pdflatex report.tex
-        pdflatex report.tex
+        xelatex report.tex
+        xelatex report.tex
         echo "Report generated"
       '';
 
