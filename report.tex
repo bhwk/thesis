@@ -1,11 +1,11 @@
-\documentclass[12pt,twoside]{report}
-\usepackage[utf8]{inputenc}
+\documentclass[12pt,twoside, draft]{report}
+% \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \graphicspath{{./images/}}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{listings}
-\usepackage[a4paper,width=150mm,top=25mm,bottom=25mm,bindingoffset=6mm]{geometry}
+\usepackage[a4paper,left=4cm, right=3cm, top=3cm,bottom=3cm]{geometry}
 \usepackage{fancyhdr}
 \pagestyle{plain}
 \renewcommand{\headrulewidth}{0.4pt}
@@ -24,6 +24,18 @@
     sorting=none
     ]{biblatex}
 \usepackage{tocbibind}
+
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage[
+    final,
+    % tracking,
+    % kerning=true,
+    % spacing=true,
+    stretch=10,
+    shrink=10
+    ]{microtype}
+
 
 \title{
   {Privacy Enhanced RAG for LLMs in Healthcare}\\
@@ -62,6 +74,7 @@ With the RAG corpus built, and the abilities of the LLM confirmed, the next step
 \end{itemize}
 
 
+\emergencystretch=1em
 \printbibliography[title=References]
 \nocite{*}
 \break

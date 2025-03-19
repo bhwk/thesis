@@ -1,8 +1,16 @@
-\chapter{Introduction}
+\chapter{Introduction} \label{introduction}
 LLMs are transforming various industries. They able to perform tasks such as automated handling of workflows with Agentic frameworks, Natural Language Processing (NLP) tasks such as information extraction, and even rudimentary reasoning in some models. In fields like Healthcare, they can automate clinical note generation and summarization, assist in diagnosis, and provide personalized patient care.
 
-However, they all suffer the same traditional issue, hallucinations, where they generate seemingly coherent but incorrect information. To address this, RAG was developed as a method to provide context to LLMs by incorporating an external knowledge base, allowing them to generate more accurate, domain-specific responses. This technique has applications in areas where hallucinations can cause severe harm, such as medicine, legal analysis, and cybersecurity.
+However, they all suffer the same traditional issue, hallucinations, where they generate seemingly coherent but incorrect information. To address this, RAG was developed as a method to provide context to LLMs by incorporating an external knowledge base, allowing them to generate more accurate domain-specific responses. This technique has applications in areas where hallucinations can cause severe harm, such as medicine, legal analysis, and cybersecurity.
 
 While RAG enhances LLM capabilities, it introduces new security risks. Attackers can exploit RAG systems to extract proprietary or sensitive data through prompt injection attacks. This is a critical privacy concern, especially in healthcare where patient confidentiality is important.
 
 In this project, we seek to test and develop an Agent-based synthetic document generation framework to mitigate these risks. By separating the RAG database from the externally facing LLM, we seek to enhance security while preserving the contextual accuracy of responses.
+
+In chapter \ref{introduction} we describe the workings of a RAG system, as well as the principles behind Medical Anonymization and its methods.
+
+\section{Background}
+
+\subsection{Retrieval Augmented Generation}
+% TODO: Add a section about RAG here
+
