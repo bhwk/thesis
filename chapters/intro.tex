@@ -5,19 +5,18 @@ Despite these capabilities, LLMs suffer from a well-documented issue known as ha
 
 To address this, Retrieval-Augmented Generation (RAG) is commonly used to supplement LLMs with external knowledge sources, improving factual accuracy by providing the LLM with context to generate from. While RAG enhances LLM performance, it also introduces new security risks. In particular, threat actors can exploit prompt injection attacks, in a similar fashion to LLMs, to manipulate retrieval outputs or extract sensitive data, which poses a significant privacy threat—especially in healthcare, where patient confidentiality is critical.
 
-In this project, we an Agent-based synthetic document generation framework designed to mitigate these risks. By separating the RAG database from the externally facing LLM, we ensure the sensitive records are not directly exposed to the model. Instead, they undergo a controlled synthesis process. Only the necessary information is extracted from the retrieved knowledge, and any appearance of sensitive information such as names and ages are replaced with placeholders before being passed to the external LLM. This reduces the likelihood of data leakage while preserving response accuracy.
+In this project, we explore an Agent-based synthetic document generation framework designed to mitigate these risks. By separating the RAG database from the externally facing LLM, we ensure the sensitive records are not directly exposed to the model. Instead, they undergo a controlled synthesis process. Only the necessary information is extracted from the retrieved knowledge, and any appearance of sensitive information such as names and ages are replaced with placeholders before being passed to the external LLM. This reduces the likelihood of data leakage while preserving response accuracy.
 
 In chapter \ref{introduction} we provide a brief description of a RAG system as well as briefly discuss applications of LLMs with RAG in healthcare.
 
 \section{Background}
 
 \subsection{Retrieval-Augmented Generation (RAG)}
-% TODO: Add a section about RAG here
 While LLMs are often trained on large datasets which, at times, provide the illusion that they have knowledge on many different fields, LLMs are still, first and foremost, text prediction engines used for Natural Language Processing (NLP) tasks.
 
 This results in the following consequence: When an LLM encounters a query about information outside its training set, it will attempt to generate a response that is gramatically coherent, but potentially unsound response, a phenomenon known as hallucination. Depending on the applications, hallucinations can range from minor inaccuracies to critical failures, such as generating false legal cases \autocite{Bohannon_2024} or misdiagnosing medical conditions.
 
-Retrieval-augmented generation (RAG), first introduced by \autocite{lewis2021retrievalaugmentedgenerationknowledgeintensivenlp}, was developed to mitigate hallucinations by integrating an external knowledge base into the LLM's generation pipeline. This grounds the LLMs respone using the retrieved knowledge, preventing speculative responses from the LLM when faced with tokens outside its training set.
+Retrieval-augmented generation (RAG), first introduced by \autocite{lewis2021retrievalaugmentedgenerationknowledgeintensivenlp}, was developed to mitigate hallucinations by integrating an external knowledge base into the LLM's generation pipeline. This grounds the LLMs response using the retrieved knowledge, preventing speculative responses from the LLM when faced with tokens outside its training set.
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{Conventional RAG example.png}

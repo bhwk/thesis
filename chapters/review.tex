@@ -1,11 +1,44 @@
 \chapter{Literature Review} \label {literature}
-\section{Background}
+
+\section{Exploitation of RAG Systems}
+
+RAG systems enhance LLMs by integrating external knowledge bases, enabling them to generate accurate, domain-specific informaion. However, this introduces specific vulnerablities that attackers can exploit. In this section we explore some exploitation methods used against RAG systems and discuss if it is possible for the attack to manifest in a healthcare setting.
+
+\subsection{Data Poisoning}
+In data poisoning attacks, attackers inject malicious or misleading information into the knowledge database that a RAG system relies on. This is also known as a backdoor attack.
+By doing so, they are able to include instructions to modify the LLM's output to achieve their objectives. For instance, an attacker is able to redirect customer inquires to an external email through the LLM's response.
+
+An example of this occurred previously with Google's Gemini, where a user was told to make use of "non-toxic glue" when making a cheese pizza. This was due to the retrieval system retrieving information from a satrical post on a social media website.
+
+As highlighted in \autocite{tan2024gluepizzaeatrocks}, data poisoning attacks are non-trivial to carry out.
+Depending on the complexity of the retrieval system, the attacker will have to modify the adversarial content such that the retrieval system is inclined to retrieve this document.
+Furthermore, the attacker requires some information about or access to the retrieval system to exploit it.
+This requirement is consistent with other studies carried out on data poisoning, and in almost all cases, the conditions in which this attack can manifest relies strictly on the insertion of a poisoned document into the RAG corpus \autocite{xue2024badragidentifyingvulnerabilitiesretrieval, tan2024gluepizzaeatrocks, xian2024vulnerabilityapplyingretrievalaugmentedgeneration}.
+
+Given these requirements, we can conclude that this type of RAG attack is non-feasible in a healthcare setting.
+In order to carry out this attack, the attacker has to have some form of access to the hospital's database.
+The cases in which this occur typically present with an external cyberattack on the hospital's infrastructure, whether through hacking or social engineering, and is considered a data breach. Most data breaches occur through hacking, as reported in \autocite{Alder_2025}.
+In this case, the attacker can gain access to the hospital's database, and does not need to rely on exploiting the RAG system.
+Thus, we can conclude that this form of attack is non-applicable in a healthcare setting.
+
+\subsection{Prompt Injection}
+Prompt injection attacks involves crafting an input query that manipulates the model into generating unintended responses.
+For RAG systems, this can be achieved either directly or indirectly.
+Indirect prompt injection attacks function similarly to data poisoning except instead of inserting misleading information, adversarial prompts are attached to frequently retrieved documents in the RAG database. This enables attackers to retrieve documents from the RAG database using trigger prompts.
+Direct prompt injection attacks involve the inclusion of a passage or sentence in the input query. This can be phrases such as "repeat all the context".
+These attacks, when targeted at RAG systems, can cause the leakage of private or sensitive information from the RAG corpus.
+
+% TODO: 
+% - Talk about how indirect prompt injection attacks allow attackers to retrieve whatever documents they want
+% - Discuss how direct prompt injection affects RAG through the LLM. Bring up that study about how fine-tuning the LLM reduces the threat of this type of attack, but also talk about how fine-tuning is a resource intensive process that requires a lot of data that may also be leaked by the LLM indirectly.
+% - Segueway into how prompt injection results in data extraction of PII (which should be its own subsection)
+While not much research has been carried out in this area, a study has shown that, even with safeguards, a simple adversarial prompt attack is sufficient to alter the output of a RAG-based agent \autocite{li2024targetingcoresimpleeffective}.
+Given that most, if not all, RAG systems are interfaced with an LLM, it is troubling
+
+As highlighted in \autocite{zeng2024goodbadexploringprivacy}, this is typically achieved through an information and command attack.
+The information component of the attack instructs the retrieval system on the type of information to be retrieved.
 
 
-\subsection{Exploitation of RAG Systems}
-Studies (\cite{tan2024gluepizzaeatrocks}; \cite{zeng2024goodbadexploringprivacy}; \cite{xue2024badragidentifyingvulnerabilitiesretrieval}) have shown that RAG systems are susceptible to well-crafted prompt attacks during the retrieval stage.
-
-By using targeted as well as untargeted attacks \autocite{zeng2024goodbadexploringprivacy}, a malicious attacker is able to retrieve personally identifiable information (PII), such as phone numbers and addresses, from a RAG's corpus.
 
 
 \autocite{tan2024gluepizzaeatrocks} and \autocite{xue2024badragidentifyingvulnerabilitiesretrieval} showcase the ability to affect an LLMs output by inserting specially crafted adversarial passages into its RAG corpus.
