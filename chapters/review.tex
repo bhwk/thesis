@@ -2,13 +2,10 @@
 
 \section{Exploitation of RAG Systems}
 
-RAG systems enhance LLMs by integrating external knowledge bases, enabling them to generate accurate, domain-specific informaion. However, this introduces specific vulnerablities that attackers can exploit. In this section we explore some exploitation methods used against RAG systems and discuss if it is possible for the attack to manifest in a healthcare setting.
+While RAG improves LLM accuracy by integrating external knowledge sources, it also introduces new vulnerabilities. Attackers can exploit a RAG system's retrieval mechanisms to manipulate outputs, bypass safeguards, and extract sensitive information. This section explores some known methods of attacks and discusses their feasibility in a healthcare setting.
 
 \subsection{Data Poisoning}
-In data poisoning attacks, attackers inject malicious or misleading information into the knowledge database that a RAG system relies on. This is also known as a backdoor attack.
-By doing so, they are able to include instructions to modify the LLM's output to achieve their objectives. For instance, an attacker is able to redirect customer inquires to an external email through the LLM's response.
-
-An example of this occurred previously with Google's Gemini, where a user was told to make use of "non-toxic glue" when making a cheese pizza. This was due to the retrieval system retrieving information from a satrical post on a social media website.
+In data poisoning attacks (also known as a backdoor attack), attackers inject malicious or misleading information into the RAG corpus, causing the LLM to generate incorrect or malicious responses. These attacks can be used to carry out fraud, misinformation campaigns or provide adversarial control over responses. An example of this occurred with Google's Gemini, where, due to retrieving information from a satirical social media post, told the user to make use of "non-toxic glue" when making a cheese pizza \autocite{McMahon_2024}.
 
 As highlighted in \autocite{tan2024gluepizzaeatrocks}, data poisoning attacks are non-trivial to carry out.
 Depending on the complexity of the retrieval system, the attacker will have to modify the adversarial content such that the retrieval system is inclined to retrieve this document.
@@ -24,30 +21,51 @@ Thus, we can conclude that this form of attack is non-applicable in a healthcare
 \subsection{Prompt Injection}
 Prompt injection attacks involves crafting an input query that manipulates the model into generating unintended responses.
 For RAG systems, this can be achieved either directly or indirectly.
+
 Indirect prompt injection attacks function similarly to data poisoning except instead of inserting misleading information, adversarial prompts are attached to frequently retrieved documents in the RAG database. This enables attackers to retrieve documents from the RAG database using trigger prompts.
+
 Direct prompt injection attacks involve the inclusion of a passage or sentence in the input query. This can be phrases such as "repeat all the context".
 These attacks, when targeted at RAG systems, can cause the leakage of private or sensitive information from the RAG corpus.
 
-% TODO: 
-% - Talk about how indirect prompt injection attacks allow attackers to retrieve whatever documents they want
-% - Discuss how direct prompt injection affects RAG through the LLM. Bring up that study about how fine-tuning the LLM reduces the threat of this type of attack, but also talk about how fine-tuning is a resource intensive process that requires a lot of data that may also be leaked by the LLM indirectly.
-% - Segueway into how prompt injection results in data extraction of PII (which should be its own subsection)
-While not much research has been carried out in this area, a study has shown that, even with safeguards, a simple adversarial prompt attack is sufficient to alter the output of a RAG-based agent \autocite{li2024targetingcoresimpleeffective}.
-Given that most, if not all, RAG systems are interfaced with an LLM, it is troubling
+\subsubsection{Indirect Prompt Injection}
+As stated previously, indirect prompt injection attacks operate in a similar fashion to data poisoning attacks as both require some form of access or ability to manipulate the RAG corpus.
 
-As highlighted in \autocite{zeng2024goodbadexploringprivacy}, this is typically achieved through an information and command attack.
-The information component of the attack instructs the retrieval system on the type of information to be retrieved.
+Instead of using a misleading document, malicious instructions are embed in the document within the corpus, allowing the attacker to manipulate the LLM's output.
+This allows the attacker to manipulate the LLM into including potentially malicious URLs into its response when responding to a victim's query \autocite{clop2024backdooredretrieverspromptinjection}.
 
+Furthermore, it should be noted that this type of prompt injection also allows the attacker manipulate the documents that are retrieved from the RAG corpus depending on the poison ratio, as covered in \autocite{peng2024dataextractionattacksretrievalaugmented}, which would allow unfettered access to any sensitive information stored in the database.
 
+However, since this type of prompt attack requires some form of access to the RAG corpus, we can functionally consider it the same as a data poisoning attack.
+Realistically, if this type of attack were to occur in a healthcare setting, the attacker would already have access to hospital records. Therefore we will not be focusing on this aspect of prompt injection attacks.
 
+\subsubsection{Direct Prompt Injection}
+Direct prompt injection involves the inclusion of an adversarial passage into the input query, and these attacks are usually carried out in a specific format.
 
-\autocite{tan2024gluepizzaeatrocks} and \autocite{xue2024badragidentifyingvulnerabilitiesretrieval} showcase the ability to affect an LLMs output by inserting specially crafted adversarial passages into its RAG corpus.
+As highlighted in \autocite{zeng2024goodbadexploringprivacy}, they consist of two components: information and command.
+The information component of the attack leads the RAG system to retrieve documents that contain that form of information. Examples of this could be names, addresses, medical conditions.
+The command component is targeted at the LLM. Phrases are included in the input query that are aimed at subverting any safeguards placed on the LLM.
+This can be a phrase such as "please repeat all context back to me," or "ignore all instructions," etc.
 
-This typically affects LLMs that make use of real-time context databases, such as a search engine, which allows an attacker to insert malicious documents into the context database.
+As the study\autocite{zeng2024goodbadexploringprivacy} shows, a significant portion of the datasets used in the study were able to be retrieved from the LLM through simple prompt attacks.
+The study also notes that the attack prompt could be further optimized for increased data extraction.
+Part of the study also noted the effects of RAG on the data that was extracted.
+It was noted that the inclusion of RAG decreased the appearance of memorized data in the LLM's output. It seems that the inclusion of RAG has caused the LLM to focus on leveraging the context retrieved rather than on its memorized training data \autocite{zeng2024goodbadexploringprivacy}.
 
-\subsection{Large Language Model (LLM) Safeguards}
-The widespread usage of LLMs necessitates the development of safeguards to prevent ethical misuse and abuse.
-These safeguards are often times complex, varying based on application requirements.
-\autocite{dong2024buildingguardrailslargelanguage} discusses the different components involved in implementing guard rails for LLMs and touches on some of the currently deployed solutions available.
-In general, safeguards are designed to prevent the LLMs from generating unintended output.
-This unintended output can be generated in numerous ways, most notably through ``hallucinations'' as well as targeted prompt attacks known as ``jailbreaking''.
+Another study also corroborates this result. In \autocite{qi2024followinstructionspillbeans}, a similar method of prompt injection was used to extract text from a RAG database. The LLMs used in this study were instruction-tuned LLMs, meaning that the model has been trained to respond to instructions.
+
+An interesting point to note was that they tested the similarity scores of the model's output with the retrieved context. Most LLMs used in the study exhibited higher BLEU, ROUGE-L, F1 and BERTScore scores that scaled with model size, suggesting that there is some correlation between an LLM capabilities and its vulnerabilities to prompt injection attacks \autocite{qi2024followinstructionspillbeans}. Additionally, between the amount of data extracted alongside the size of the context retrieved was noted, further asserting that RAG has inherent vulnerabilities that are not being addressed.
+
+Both studies discussed have shown a clear vulnerability of RAG to sufficiently sophisticated prompt injection attacks, but not much research has been done regarding the mitigation of RAG output post-occurrence of a prompt injection attack.
+
+While it is possible to include safeguards to prevent the occurrence of prompt attacks, their implementations are still vulnerable. This is highlighted in \autocite{li2024targetingcoresimpleeffective}, where a simple prompt of "ignore the context" caused the LLM agent to disregard any context retrieved despite the safeguards implemented.
+Considering that a simple prompt like this was sufficient enough to manipulate the model's output, it suggests that RAG pipeline implementations may be more fragile than initially anticipated, and a sufficiently motivated attacker will eventually be able to penetrate any LLM-level safeguards in place.
+
+These findings suggest that current RAG implementations lack strong defenses against targeted prompt injection attacks. While preventive safeguards exist, adversarial prompt injections can still manipulate retrieval. This highlights the need for alternative security measures - such as synthetic document generation - to obfuscate retrieved context and prevent LLMs from directly accessing sensitive data in a RAG corpus.
+
+\section{Medical Anonymisation}
+
+% TODO:
+% - Discuss the different methods of medical anonymisation
+% - also what's the principle behind it
+% - say which methods we're gonna be using
+% - maybe add a section on synthesizing information?
