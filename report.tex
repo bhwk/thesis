@@ -54,14 +54,23 @@
 \begin{document}
 \pagenumbering{roman}
 \maketitle
-\input{chapters/abstract.tex}
 
+\clearpage
+\addcontentsline{toc}{chapter}{Abstract}
+\input{chapters/abstract.tex}
+\clearpage
+\stepcounter{page}  % Ensures the next page gets a new Roman numeral
+
+\clearpage
 \tableofcontents
+\clearpage
 \listoffigures
+\clearpage
 \listoftables
 
-\newpage
+\clearpage
 \pagenumbering{arabic}
+\setcounter{page}{1}
 \input{chapters/intro.tex}
 \input{chapters/review.tex}
 \input{chapters/methodology.tex}

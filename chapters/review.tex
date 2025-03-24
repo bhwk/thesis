@@ -62,10 +62,28 @@ Considering that a simple prompt like this was sufficient enough to manipulate t
 
 These findings suggest that current RAG implementations lack strong defenses against targeted prompt injection attacks. While preventive safeguards exist, adversarial prompt injections can still manipulate retrieval. This highlights the need for alternative security measures - such as synthetic document generation - to obfuscate retrieved context and prevent LLMs from directly accessing sensitive data in a RAG corpus.
 
-\section{Medical Anonymisation}
+\section{Medical Anonymization}
+In clinical settings, it is necessary to anonymize a dataset before releasing it to be shared. Based on that principle, we can further extend to healthcare applications that the public can access.
 
+According to \autocite{Rodriguez_Tuck_Dozier_Lewis_Eldridge_Jackson_Murray_Weir_2022}, the three main methods used in preserving medical privacy are Pseudonymization, De-identification, and Anonymization.
+
+Each method can be summed up by the following:
+
+Pseudonymization involves replacing attributes with pseudonyms.
+
+De-identification involves the removal of PII from patient records.
+
+Anonymization involves distorting the record such that it cannot be related to its original record.
 % TODO:
 % - Discuss the different methods of medical anonymisation
 % - also what's the principle behind it
 % - say which methods we're gonna be using
 % - maybe add a section on synthesizing information?
+
+Each of these methods are aimed at preserving clinical privacy, and are used in tandem.
+
+As described in the study, the release of a clinical dataset involves de-identification of clinical data, after which the data undergoes either anonymization or pseudonymization before being released.
+
+Further, the data can be manipulated in certain ways. Methods include addition of random noise to variables, converting ages to their relative dates, or categorising ages. This is a non-exhaustive list of methods and the rest can be seen in \autocite{Rodriguez_Tuck_Dozier_Lewis_Eldridge_Jackson_Murray_Weir_2022}.
+
+The document synthesis process operates based on some of these principles. In particular, we make use of methods that maintain some relation to the original record.
