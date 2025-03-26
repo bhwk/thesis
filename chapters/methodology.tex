@@ -40,13 +40,18 @@ Individual FHIR patient records are stored in what is known as resources and eac
 
 FHIR records can appear in different file formats, JSON, XML, or RDF. For simpler parsing and handling, we will be making use of JSON FHIR files to build our RAG corpus.
 
-We make use of the open-source library \textit{Llamaindex}\autocite{Liu_LlamaIndex_2022} for abstractions when building the pipeline, as well as creating the database.
+We make use of the open-source library \textbf{Llamaindex} \autocite{Liu_LlamaIndex_2022} for abstractions when building the pipeline, as well as creating the database.
 
 \subsection{FHIR Preprocessing}
 
 First, we consider the type of data we wish to embed. JSON files are designed for programmatic use, meaning that they contain many identifying and delimiting tokens. If we were to convert the file in its entirety into its vector representation, it will result in detail being lost due to the repeated embedding of same key-value token pairs. Therefore, we first have to carry out flattening of the FHIR record.
 
-Flattening the FHIR involves two things. First, we must determine what type of information we wish to extract. For this project, we are only working with information from the Patient resource, as well as the Observation, Procedure, Condition, Allergy and MedicationRequest resources. While initially the Encounter resource was used, we decided that it did not add any type of substantial information apart from the reason of the encounter as well as the location where it took place.
+Flattening the FHIR involves two things. First, we must determine what type of information we wish to extract. For this project, we are only working with information from the Patient resource, as well as the Observation, Procedure, Condition, Allergy and MedicationRequest resources. While initially the Encounter resource was used, we decided that it did not add any type of substantial information apart from the reason of the encounter as well as the location where it took place. Secondly, we have to convert the selected information into basic sentences. This is done by recursively un-nesting the FHIR resource with the information we specified.
+
+The reason we do this is to improve the embedding accuracy of the FHIR record.
+Firstly, we convert FHIR resources to basic sentences.
+This is to avoid repeatedly embedding the same key-value token pairs and wasting embedding tokens.
+Refer to figure \ref{fig:FHIRtoSentence} for an example.
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{Converting FHIR to sentence.png}
@@ -55,16 +60,39 @@ Flattening the FHIR involves two things. First, we must determine what type of i
 	\label{fig:FHIRtoSentence}
 \end{figure}
 
-Secondly, we have to convert the selected information into basic sentences. This is done by recursively un-nesting the FHIR resource with information we specified.
-The reason we do this is to improve the embedding accuracy of the FHIR record.
-Firstly, we convert FHIR resources to basic sentences.
-This is to avoid repeatedly embedding the same key-value token pairs and wasting embedding tokens.
-Refer to figure \ref{fig:FHIRtoSentence} for an example.
-
 Processing the FHIR record, we group the information extracted from the Observation and Procedure resources by date. Afterwards, we collate the conditions, allergies, as well as the medications that has been assigned to the patient previously.
 
-Each of these documents are stored in separate files, marked by the patient's name followed by the date of the encounter. These documents are then converted into vectors through the use of a text-embedding model, and stored within a Postgres database utilizing the \textit{pgvector} extension. The embedding model used for generating the embeddings is \emph{bge-base-en-v1.5}. The process is outlined in figure \ref{fig:EmbeddingsDatabase}.
+Using the archive officially distributed by \textbf{Synthea}, which contains 101 synthetic patients, we end up with a total of \textbf{5931} files. Figure \ref{fig:FileDistribution} shows the file distribution across patients. As we can see, there is a significant number of synthetic patients with over 100 files.
 
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\linewidth]{file_distribution.png}
+	\caption{File Distribution}
+	\label{fig:FileDistribution}
+\end{figure}
+
+Over concerns about whether this will affect the retrieval results, we decided to remove any outliers that appear. How do we define outliers? By inspection we see that, on average, synthetic patients have around 40 to 60 files per patient, with few approaching 80 to 90 files.
+Removing them, we end up with the following new distribution as seen in figure \ref{fig:FileDistributionAfter}. As we can see, we end up with a more reasonable distribution.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\linewidth]{file_distribution_trimmed.png}
+	\caption{New File Distribution}
+	\label{fig:FileDistributionAfter}
+\end{figure}
+
+Each of these documents are stored in separate files, marked by the patient's name followed by the date of the encounter to facilitate the document embedding process.
+
+\subsection{Generating Embeddings}
+
+With the documents processed, we move on to embedding the documents. Vector embedding is the process of converting values to their vector equivalents, which are essentially a list of numbers representing our value.
+By doing this, we can approximate the semantic similarity between objects through their proximity within the vector space. This makes it useful for RAG applications where semantic searches are common.
+
+Before generating the vector embeddings from the documents, we have to consider which embedding model to use. Given that we are working with text, we looked towards text embedding models. Here the differences between models vary in size and performance. For this project we make use of open-source model \textbf{bge-base-en-v1.5} to generate the vector embeddings for the documents.
+
+Each document is passed to the transformer model where it outputs the corresponding vector representation, then stored within the database. There are a number of different possible databases designed for vector embeddings, however, in this project we make use of the \textbf{Postgresql} database as well as the \textbf{pgvector} extension in order to enable vector storage.
+
+The overall process of the embedding generation is outlined in figure \ref{fig:EmbeddingsDatabase}.
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{Store embeddings in DB.png}
@@ -73,7 +101,62 @@ Each of these documents are stored in separate files, marked by the patient's na
 	\label{fig:EmbeddingsDatabase}
 \end{figure}
 
-\subsection{Retrieval}
+
+\section{Large Language Model Choice}
+
+With our RAG corpus processed and populated, we now look towards selecting the LLM to serve as the basis of our agents.
+Not all LLMs are made equal, and a general convention is that the larger, the more sophisticated its response.
+The intuitive choice is to make use of a well-established third-party LLM like OpenAI's ChatGPT, however, this is not acceptable due to the fact that it is a closed, proprietary model. In a field like healthcare, where private and sensitive information will be distributed, this is non-negotiable since it cannot be guaranteed that the data shared with ChatGPT will not be used for training or other purposes.
+
+Given this reasoning, we look towards open-source LLMs. For our requirements, the LLM has to be able to make use of tools. Tools are functions that the LLM can call to perform a specific action. For example, it could call a function to add or subtract two numbers. In this project, functions are used to allow the LLM to perform searches on our RAG corpus.
+
+There are a few notable LLMs that can make use of tools, such as Alibaba's reasoning model \textbf{QwQ}, Meta's \textbf{Llama3}, and Mistral AI's \textbf{Mistral}. In this project we decided to make use of Alibaba's \textbf{Qwen-2.5-32B}. It is a decent baseline model that performs adequately in all aspects, and we do not require the capabilities of a reasoning model like \textbf{QwQ}, as that will add to the total inference time.
+
+\section{Agent Workflow Design}
+
+Now that we have decided on the model to use, we move to designing the agents that will be involved in the workflow.
+
+The document synthesis pipeline consists of three agents, each with their respective prompts.
+There is the Synthesis Agent, which is in charge of transforming the information that is retrieved. The Search Agent is in charge of carrying out the necessary semantic searches on the database using the input query. Finally, the Review Agent is in charge of checking the synthesized information generated by the Synthesis Agent.
+
+%TODO: Add the agent prompts to the appendix
+The prompts for each agent are available in the appendix.
+
+Figure \ref{fig:AgentInteraction} outlines the flow of interactions between the different agents.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{agent-workflow.png}
+	\caption{Agent Interaction Flow}
+	\label{fig:AgentInteraction}
+\end{figure}
+
+Upon receiving an input query, the Synthesis Agent passes off control to the Search Agent, which determines what kind of searches need to be run.
+
+There are two ways the Search Agent can carry out searches. First, it can carry out a semantic search using information from the query. Secondly, it can check for patients that have been diagnosed with a specific condition. The logic behind this is to enable the Search Agent to carry out general queries, such as searching for medications given to patients diagnosed with the same condition.
+
+At this stage, the Search Agent is also in charge of determining the right information to return. Here we make use of \textbf{Llamaindex's} implementation,  which consolidates smaller chunks into larger chunks that better fit the context window, refining the chunks sequantially untill all the chunks have been consumed.
+
+Finally, once the necessary information has been consolidated, we return it to the Synthesis Agent.
+
+The Synthesis Agent is in charge of transforming the information received. The main aspects that it changes is that it replaces names with pseudonyms, as well as attempts to remove all occurrence of PII within the retrieved information. Finally, it rounds off any numerical values that appear, and attempts to consolidate them into a range.
+
+Using the newly synthesized information, it generates a new query in order to ensure that the LLM notices the relation between the synthesized context and query. The synthetic query may or may not differ from the original query, depending on the type of information retrieved, however the model should not produce a response that is too different from the baseline response.
+
+The Review Agent's purpose is to ensure that the Synthesis Agent's response adheres to the guidelines set. It has been prompted similarly to the Synthesis Agent, however its main purpose is simply to point out any errors in the Synthesis Agent's response and allow for correction.
+
+At the end of it, we will have a segment of text synthesized from the original documents that does not contain PII, with only the information that is needed to answer the input query.
+\section{Search Functions}
+
+% TODO: 
+% Talk about the reasoning behind why we designed the way it is
+% Talk about how we can vary the nodes that we retrieve
+% Talk about why we used the workflow instead of just a plain function
+With the workflow outlined, we move into designing the search functions for the Search Agent.
+
+Here we discuss how the search functions are designed for the Search Agent.
+
+\section{Retrieval}
 While not the scope of the project, it should be noted that during the creation of the database, Hierarchical Navigable Small World (HNSW) is used, which plays some influence in the retrieval results. We will not explore how the variations affect the retrieval results in this project.
 
 With the RAG corpus built, we can now move onto retrieving documents associated with a query.
@@ -94,46 +177,3 @@ Refer to figure \ref{fig:RetrievalExample} for an example of the returned chunks
 	\caption{Input Query: Which patients have diabetes?}
 	\label{fig:RetrievalExample}
 \end{figure}
-
-\section{Large Language Model Choice}
-
-Not all LLMs are made equal, and this is still true today. LLMs differ in quality in mainly two ways, the size of the model or the quality of the training dataset. Certain models trained on smaller, high quality datasets have been known to occasionally compete with larger sized models like OpenAI's ChatGPT.
-
-However, in healthcare settings, it is unlikely for a commercial LLM like ChatGPT to be used due to the private medical data involved, as such, we look towards locally run LLMs that can satisfy our requirements.
-
-Given that we are making use of an agent-based approach, the LLM has to have the capabilities to make use of tools. Tools are, simply put, functions that the LLM can call to perform an action. An example would be calling a function for addition or subtraction.
-
-The choice here can be arbitrary, but a sufficiently large model must be used in order to ensure adequate outputs. For this project, the open-source model \textbf{Qwen-2.5-32B} is used. It is possible to make use of models as small as Mistral's \textbf{Nemo-12B}, however the output will suffer.
-
-\section{Agent Workflow Design}
-
-The document synthesis pipeline consists of three agents, each with their respective prompts.
-There is the Synthesis Agent, which is in charge of transforming the information that is retrieved. The Search Agent is in charge of carrying out the necessary semantic searches on the database using the input query. Finally, the Review Agent is in charge of checking the synthesized information generated by the Synthesis Agent.
-
-The prompts for each agent are available in the appendix.
-
-Figure \ref{fig:AgentInteraction} outlines the flow of interactions between the different agents.
-
-Upon receiving an input query, the Synthesis Agent passes off control to the Search Agent, which determines what kind of searches need to be run.
-
-There are two ways the Search Agent can carry out searches. First, it can carry out a semantic search using information from the query. Secondly, it can check for patients that have been diagnosed with a specific condition. The logic behind this is to enable the Search Agent to carry out general queries, such as searching for medications given to patients diagnosed with the same condition.
-
-At this stage, the Search Agent is also in charge of determining the right information to return. The retrieved is appended to the context, however, how the chunks of text are handled is determined by \textbf{Llamaindex's} implementation. The retrieved documents are consolidated into one larger chunk that make better use of the model's context window, then the LLM refines the answer for each chunk sequentially.
-
-Finally, once the necessary information has been consolidated, we return it to the Synthesis Agent.
-
-The Synthesis Agent is in charge of transforming the information received. The main aspects that it changes is that it replaces names with pseudonyms, as well as attempts to remove all occurrence of PII within the retrieved information. Finally, it rounds off any numerical values that appear, and attempts to consolidate them into a range.
-
-Using the newly synthesized information, it generates a new query in order to ensure that the LLM notices the relation between the synthesized context and query. The synthetic query may or may not differ from the original query, depending on the type of information retrieved, however the model should not produce a response that is too different from the baseline response.
-
-The Review Agent's purpose is to ensure that the Synthesis Agent's response adheres to the guidelines set. It has been prompted similarly to the Synthesis Agent, however its main purpose is simply to point out any errors in the Synthesis Agent's response and allow for correction.
-
-At the end of it, we will have a segment of text synthesized from the original documents that does not contain PII, with only the information that is needed to answer the input query.
-
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{agent-workflow.png}
-	\caption{Agent Interaction Flow}
-	\label{fig:AgentInteraction}
-\end{figure}
-
