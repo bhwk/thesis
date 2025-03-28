@@ -105,9 +105,11 @@ The overall process of the embedding generation is outlined in figure \ref{fig:E
 
 \subsubsection{Generating Questions}
 
-After the process of creating the corpus, we also generate a single question based on the contents of the file. This is to test the accuracy of the RAG retrieval later.
+After the process of creating the corpus, we also generate a single question based on the contents of each file. This is to test the accuracy of the RAG retrieval later.
 
-Each file is passed to a LLM with the following prompt: \textit{"Generate a single question about the following text. Avoid general queries such as marriage status, death, age, contact, address. Text: $\{text\}$"}, and once the questions have been processed with store them in a JSON file for use later.
+Each file is passed to a LLM with the following prompt: \textit{"Generate a single question about the following text. Avoid general queries such as marriage status, death, age, contact, address. Text: $\{text\}$"}, and once the questions have been processed we store them in a JSON file for use later.
+
+In general each question contains a piece of information contained within the text file, as well as the date associated.
 \section{Large Language Model Choice}
 
 
@@ -165,7 +167,7 @@ The retrieval method varies based on the type of information stored. In this pro
 
 The semantic searches facilitate the retrieval of queries related to medical readings. This could be blood pressure, glucose, etc.
 
-The keyword searches are targeted at looking up patients diagnosed with a specific condition. This is to facilitate two step searches. For example, an input query might ask \textit{"What medications are diabetes patients on?"}.
+The keyword searches are targeted at looking up patients diagnosed with a specific condition. This is to facilitate two step searches. For example, an input query might ask \textit{"What medications are diabetes patients on?"}
 If the agent only has access to semantic searches, it will not have enough information to answer the query unless we adjust it with a high \textit{k} value, but that does not guarantee that the nodes retrieved will be correct, because the search query will also be adjusted by the agent.
 
 The process of semantic retrieval involves converting the input query into its vector equivalent in order to compare it to the other document vectors in the database. The similarity between vectors is computed using cosine similarity, with the formula defined as:
@@ -188,6 +190,50 @@ This is visually represented in figure \ref{fig:RagWorkflow}.
 	\label{fig:RagWorkflow}
 \end{figure}
 
-With the RAG workflow defined, we create two separate functions that call the workflow with the \textit{'semantic'} and \textit{'keyword'} parameters and the input query. The input query can either be passed verbatim by the agent, or modified depending on the circumstances. The functions will two things, the retrieved information as well as the set of nodes that were retrieved.
+With the RAG workflow defined, we create two separate functions that call the workflow with the \textit{'semantic'} and \textit{'keyword'} parameters and the input query. The input query can either be passed verbatim by the agent, or modified depending on the circumstances. These functions return two things, the retrieved information as well as the set of nodes that were retrieved. Refer to figures \ref{fig:SemanticSearchFunc} and
+\ref{fig:KeywordSearch} for the code used.
+\begin{figure}
+	\centering
+	\small
+	\begin{lstlisting}[language=Python, breaklines=true]
+async def retrieve_medical_readings_for_patient(
+    query: str,
+):
+    """A tool for running semantic search for information related to a patient.
+    Only contains patient information on a local database.
+    Information consists of medical observations.
+    Necessary to specify the patient's name in the form ([information to search] for [patient name])."""
 
-The set of nodes retrieved are matched against the.
+    result = await rag.run(
+        query=query,
+        mode="semantic",
+        vector_index=VECTOR_INDEX,
+        keyword_index=KEYWORD_INDEX,
+        llm=llm,
+    )
+    return result
+\end{lstlisting}
+	\caption{Semantic Search Function}
+	\label{fig:SemanticSearchFunc}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\small
+	\begin{lstlisting}[language=Python, breaklines=true]
+async def search_for_patients_with_medical_condition(
+    query: str,
+):
+    """A tool to search for patients with the specified medical condition."""
+    result = await rag.run(
+        query=query,
+        mode="keyword",
+        vector_index=VECTOR_INDEX,
+        keyword_index=KEYWORD_INDEX,
+        llm=llm,
+    )
+    return result
+\end{lstlisting}
+	\caption{Keyword Search Function}
+	\label{fig:KeywordSearch}
+\end{figure}
