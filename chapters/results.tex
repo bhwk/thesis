@@ -1,0 +1,159 @@
+\chapter{Results} \label{results}
+
+In this section we evaluate the effectiveness of the agent-based document synthesis pipeline. We evaluate the following metrics: Node retrieval accuracy, semantic similarities between the synthesized components and their original forms, as well as the system's performance against prompt injection attacks.
+
+We run the series of tests against both the agent-based system as well as just a singular agent with access to the search functions mentioned in the previous section.
+\section{RAG Accuracy}
+In this section we are only concerned with the nodes that are retrieved from the RAG pipeline. We modify the pipeline to return only the nodes retrieved by our RAG system. We test three cases, access only to the semantic function, access to only the keyword search function, and finally access to both functions. For all cases, we modify the function descriptor and names to be the same. For case 3 we call both the semantic and keyword searches together, then concatenate the results.
+
+For the semantic search function in figure \ref{fig:SemanticSearchFunc}, it should be noted that instead of just the top \textit{k} results, we retrieve \textit{2k} nodes because our vector retriever is performing a hybrid search, a combination of vector search and text search. In this case, the top \textit{k} nodes are the ones with the highest similarity, while the bottom \textit{k} nodes are the results of the text search.
+
+In the keyword search, it extracts 10 keywords per query, and then extracts \textit{k} chunks that best match the keywords extracted. We make use of a regex based keyword search in this project.
+
+Using the previously generated question list, we randomly select 100 questions and pass them into our RAG pipeline. Here we evaluate if the original file that the question was generated from is present within the series of nodes retrieved by the RAG system. If there are no nodes retrieved, we treat it as a miss. We track the number of nodes retrieved for each case and value of \textit{k}.
+
+For each case we perform the selection 5 times, then compute the average. We also vary the value of \textit{k} to determine if there is any improvement to accuracy.
+
+The following table presents the results for each case:
+
+\begin{table}
+	\centering
+	\caption{RAG Accuracy Comparison}
+	\label{Tab:RAGAccuracyComp}
+	\begin{tabularx}{0.7\textwidth}
+		{
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X |}
+		\hline
+		                  & \textit{k = 3} & \textit{k = 4} & \textit{k = 5} \\
+		\hline
+		Semantic (Hybrid) & 81.8           & 82.4           & 88             \\
+		\hline
+		Keyword           & 26.2           & 32.2           & 30.4           \\
+		\hline
+		Both              & 83.8           & 85.8           & 88             \\
+		\hline
+	\end{tabularx}
+\end{table}
+
+
+As observed in table \ref{Tab:RAGAccuracyComp}, the keyword search performs the worst on its own. The cases where the semantic searches are present both perform similarly. This is most likely due to the two factors. First, the semantic searches used in this project are performing hybrid searches, meaning the search combines the results from both dense and sparse vectors. Dense vectors are vectors produced using text embedding models similar to the one used in this project. Sparse vectors are computed using different algorithms, such as BM25. We can consider it a combination of a traditional search alongside semantic search, as such it makes sense that the hybrid search method performs the best.
+
+Secondly, since we generate questions using the file text as content, the LLM tends to use the file as contextual base and includes details such as dates and names, or quotes information that appears directly within the text. This could result in the semantic search results improving due to the similarities between the text and the query. Furthermore, regex keyword search is inherently limited, which will impact the results negatively.
+
+We also consider the performance of the non-hybrid semantic search in table \ref{Tab:NonHybridSemantic}. As expected, the accuracy of the non-hybrid semantic search decreases moderately. However, it does still perform better than the standalone keyword search.
+
+
+\begin{table}
+	\centering
+	\begin{tabularx}{0.7\textwidth}
+		{
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X |}
+		\hline
+		                      & \textit{k = 3} & \textit{k = 4} & \textit{k = 5} \\
+		\hline
+		Semantic (Non-hybrid) & 52             & 60.2           & 66.6           \\
+		\hline
+	\end{tabularx}
+	\caption{Non-hybrid Semantic Search}
+	\label{Tab:NonHybridSemantic}
+\end{table}
+
+Furthermore, we note that the accuracy increases with \textit{k}, which is to be expected as more nodes are being retrieved. However, while the accuracy of the node retrieval does increase, it does not guarantee an improvement in the LLM's response. An increase in nodes retrieved will result in more information being added to the LLM's context window, which may cause it overlook critical information within the text that would answer the query.
+
+\section{Semantic Similarity}
+
+In this section we consider the semantic similarities of the synthesized query and information to the original, as well as the similarity between responses generated from the synthetic information and the original information retrieved by the RAG system.
+
+We select 100 random questions and pass it to the document synthesis system. We set the value of \textit{k} to be 3 for the semantic search function. For the keyword search function, we set the value of \textit{k} to be 10.
+
+The synthesized information (alongside the synthesized query) and the original information is passed separately to the LLM to generate two responses which are recorded. We can then compare the semantic similarity between the two responses.
+
+We make use of the following commonly used metrics to compute scores for each component: Bilingual Evaluation Understudy (BLEU) , Recall-Oriented Understudy for Gisting Evaluation (ROUGE) and BERTScore. Finally, we also include SemScore as seen in \autocite{aynetdinov2024semscoreautomatedevaluationinstructiontuned} to compute the semantic similarity between the corresponding components.
+
+BLEU is primarily used in machine translation, however it is also a common metric for Natural Language Processing (NLP) tasks. It measures how many n-grams (continuous sequence of words) in the candidate text that appears in the reference text.
+
+ROUGE is often used for summarization tasks. It measures overlap in terms of recall, which is how much of the reference text is captured in the candidate text.
+
+Both BERTScore and SemScore evaluate the semantic similarity between the reference and candidates text by leveraging the embeddings generated by a text embedding model. BERTScore uses these embeddings to compute the cosine similarity between words in order to compute the sentence cosine similarity. SemScore operates in the same manner, however instead of computing the cosine similarity between words in a sentence, it computes the cosine similarity of entire responses.
+
+We set the reference to be the information retrieved by the RAG system, and the candidate to be the synthesized information. We do the same for the synthesized query and original query. Finally, we compare the response of the document-synthesis system to a single-agent system with search function access.
+
+We separate the results into two tables, table \ref{Tab:BLEUandROUGE} and table \ref{BERTandSem}.
+
+\begin{table}[h]
+	\centering
+	\begin{tabularx}{\textwidth}
+		{
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X |}
+		\hline
+		                                     & BLEU   & ROUGE-1 & ROUGE-2 & ROUGE-L \\
+		\hline
+		Synthesized Information              & 0.0913 & 0.416   & 0.258   & 0.353   \\
+		\hline
+		Synthesized Query                    & 0.396  & 0.692   & 0.536   & 0.660   \\
+		\hline
+		Response with Synthesized components & 0.181  & 0.526   & 0.269   & 0.386   \\
+		\hline
+	\end{tabularx}
+	\caption{BLEU and ROUGE scores}
+	\label{Tab:BLEUandROUGE}
+\end{table}
+
+Looking at the BLEU and ROUGE scores in table \ref{Tab:BLEUandROUGE}, we note low BLEU scores, particularly for the synthesized information. This is expected, because as the information undergoes synthesis, details are modified or replaced in order to distance it from the original information retrieved. The low ROUGE scores for the synthesized information is also consistent with the low BLEU score.
+
+In the case of the synthesized query, it has the highest BLEU and ROUGE scores. The synthesized query is designed to closely resemble the original query to ensure that the response the system generates takes into account the synthesized information, even if this results in the synthetic query containing less information than the original query.
+
+For the low BLEU and ROUGE scores for the response, this is likely due to the non-deterministic nature of LLMs. The output of LLMs are not consistent across reruns, furthermore, the manner in which the response is structured will also vary between runs despite access to the same information. As such, it is expected that the response generated by the synthesized information varies from the response with the original information.
+
+\begin{table}[h]
+	\centering
+	\begin{tabularx}{\textwidth}
+		{
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X
+			|  >{\raggedright\arraybackslash}X |}
+		\hline
+		                                     & BERT Precision & BERT Recall & BERT F1 & SemScore \\
+		\hline
+		Synthesized Information              & 0.3209         & -0.01135    & 0.1459  & 0.6793   \\
+		\hline
+		Synthesized Query                    & 0.6065         & 0.3515      & 0.4760  & 0.7698   \\
+		\hline
+		Response with Synthesized components & 0.4290         & 0.3182      & 0.3728  & 0.7938   \\
+		\hline
+	\end{tabularx}
+	\caption{BERTScore and SemScore}
+	\label{BERTandSem}
+\end{table}
+
+In table \ref{BERTandSem}, we observe that the BERT Precision, Recall, and F1 scores vary from poor to moderate. This is to be expected. BERTScore computes the sentence similarity using token-level cosine similarity, differences in word choice can result in lower token similarity, resulting in lower scores.
+
+We also observe that the recall rate for the synthesized information is negative. This is likely due to the modifications made to the information retrieved, as it means that less of the reference tokens, meaning the original information, is covered by the tokens in the synthetic information.
+
+In all cases we observe that the SemScore performs well. This means that there is a strong to moderate semantic link between the original as well as the synthesized components and responses.
+
+\section{
+  PII Extraction Attacks
+ }
+
+In this section we perform a series of targeted PII attacks on the document synthesis system and a single-agent system. The single-agent system has access to the same search functions as the document synthesis system.
+
+The differences between the document synthesis system and the single-agent system is that the document synthesis system passes off the synthesized information to an external LLM to generate a response. The single-agent system performs both searching and answering of the input query.
+
+We provide the external LLM and the single-agent system similar protective prompts.
+
+For the adversarial prompts, we create input prompts aimed at manipulating the model into ignoring its instructions as well as repeating its context. We append the type of PII we wish to extract, either names, addresses or contact numbers. Following that, we run PII detection on the output from each system and tabulate the occurrences of either a repeat context or PII presence in the output.
+
+
