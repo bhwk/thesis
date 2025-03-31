@@ -1,4 +1,4 @@
-\chapter{Methodology}
+\chapter{Methodology} \label{methodology}
 \section{Description of Pipeline}
 Based on research into RAG vulnerabilities, there is a clear lack of security measures designed to preserve the privacy of a RAG corpus. This is especially important in fields like healthcare.
 As demonstrated in \autocite{zeng2024goodbadexploringprivacy}, private information can be easily extracted by determined attackers through simple prompt injections.
@@ -158,9 +158,8 @@ At the end of it, we will have a segment of text synthesized from the original d
 
 With the workflow outlined, we move into designing functions for each agent to call.
 
-\subsection{Search Functions}
+\subsection{RAG Worflow}
 
-Here we define the process of creating functions for the Search Agent to interact with the RAG system.
 
 The retrieval method varies based on the type of information stored. In this project, we make use of semantic searches as well as keyword searches in our RAG system.
 
@@ -178,7 +177,8 @@ It is possible to set a minimum cut-off point for cosine similarity to adjust th
 
 To allow the agent to make use of both semantic and keyword searches, we turn the retrieval process into its own workflow, that takes a search mode as well as the query.
 
-Depending on the mode of retrieval, we run the query against either our vector index or keyword index, then extract the necessary context information as well as the nodes that were retrieved before finally returning the result from our RAG workflow.
+Depending on the mode of retrieval, we run the query against either our vector index or keyword index and receive a set of nodes. Using the set of nodes, we make a call to the LLM to extract the necessary context information from the nodes and return the final result from the workflow.
+This is visually represented in figure \ref{fig:RagWorkflow}.
 
 \begin{figure}
 	\centering
@@ -187,7 +187,9 @@ Depending on the mode of retrieval, we run the query against either our vector i
 	\label{fig:RagWorkflow}
 \end{figure}
 
-This is visually represented in figure \ref{fig:RagWorkflow}.
+
+\subsection{Search Functions}
+Here we define the process of creating functions for the Search Agent to interact with the RAG system.
 
 With the RAG workflow defined, we create two separate functions that call the workflow with the \textit{'semantic'} and \textit{'keyword'} parameters and the input query. The input query can either be passed verbatim by the agent, or modified depending on the circumstances. These functions return two things, the retrieved information as well as the set of nodes that were retrieved. Refer to figures \ref{fig:SemanticSearchFunc} and
 \ref{fig:KeywordSearch} for the code used.

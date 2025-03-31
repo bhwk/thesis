@@ -63,28 +63,10 @@ Considering that a simple prompt like this was sufficient enough to manipulate t
 These findings suggest that current RAG implementations lack strong defenses against targeted prompt injection attacks. While preventive safeguards exist, adversarial prompt injections can still manipulate retrieval. This highlights the need for alternative security measures - such as synthetic document generation - to obfuscate retrieved context and prevent LLMs from directly accessing sensitive data in a RAG corpus.
 
 \section{Medical Anonymization}
-In clinical settings, it is necessary to anonymize a dataset before releasing it to be shared. Based on that principle, we can further extend to healthcare applications that the public can access.
+The document synthesis system proposed in this project makes use of anonymization techniques in order to distance it from the original information received. Here we discuss traditional methods of medical anonymization and what they entail.
 
-According to \autocite{Rodriguez_Tuck_Dozier_Lewis_Eldridge_Jackson_Murray_Weir_2022}, the three main methods used in preserving medical privacy are Pseudonymization, De-identification, and Anonymization.
+In clinical settings, preserving the privacy of patients is important, especially when sharing or releasing datasets. This also extends to publicly accessible healthcare applications. \autocite{Rodriguez_Tuck_Dozier_Lewis_Eldridge_Jackson_Murray_Weir_2022} outlines three main methods employed to preserve medical privacy: pseudonymization, de-identification, and anonymization.
 
-Each method can be summed up by the following:
+Pseudonymization involves replacing identifying attributes with pseudonyms, which maintains its relation to the original data but masks direct identifiers. De-identification focuses on removing Personally Identifiable Information (PII) from patient records, aimed at prevent individual identification. Anonymization distorts data to the point that it can no longer be associated with the original record, thus eliminating the possibility of it being linked back to the original record.
 
-Pseudonymization involves replacing attributes with pseudonyms.
-
-De-identification involves the removal of PII from patient records.
-
-Anonymization involves distorting the record such that it cannot be related to its original record.
-% TODO:
-% - Discuss the different methods of medical anonymisation
-% - also what's the principle behind it
-% - say which methods we're gonna be using
-% - maybe add a section on synthesizing information?
-% WARNING: come back to look at this in the future
-
-Each of these methods are aimed at preserving clinical privacy, and are used in tandem.
-
-As described in the study, the release of a clinical dataset involves de-identification of clinical data, after which the data undergoes either anonymization or pseudonymization before being released.
-
-Further, the data can be manipulated in certain ways. Methods include addition of random noise to variables, converting ages to their relative dates, or categorising ages. This is a non-exhaustive list of methods and the rest can be seen in \autocite{Rodriguez_Tuck_Dozier_Lewis_Eldridge_Jackson_Murray_Weir_2022}.
-
-The document synthesis process operates based on some of these principles. In particular, we make use of methods that maintain some relation to the original record.
+These methods are often used in tandem to provide privacy protection. The release of clinical datasets typically involves an initial de-identification step, followed by either anonymization or pseudonymization. The data can be further manipulated by introducing random noise, converting specific dates to relative dates, or categorizing ages in order to further protect patient information. A comprehensive overview of these methods can be found in \autocite{Rodriguez_Tuck_Dozier_Lewis_Eldridge_Jackson_Murray_Weir_2022}.

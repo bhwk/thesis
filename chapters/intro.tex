@@ -1,13 +1,19 @@
 \chapter{Introduction} \label{introduction}
-Large Language Models (LLMs) are transforming various industries by enabling tasks such as automated workflow management using agentic frameworks, information extraction in Natural Language Processing (NLP), and even rudimentary reasoning in some models. In healthcare, LLMs have the potential to assist with clinical note generation, medical summarization, diagnosis support, and personalized patient care.
+The increasing adoption of Large Language Models (LLMs) in healthcare for tasks such as clinical note summarization, medical report generation, and diagnostic assistance, presents significant challenges regarding the safety of sensitive patient data. While LLMs have the potential to improve efficiency and patient care, they suffer from a well-documented issue known as hallucinations, where they generate seemingly coherent but incorrect information. This is particularly problematic in healthcare where misinformation can have potentially disastrous consequences.
 
-Despite these capabilities, LLMs suffer from a well-documented issue known as hallucinations, where they generate seemingly coherent but incorrect information. This has potentially disastrous complications in high-stakes domains such as medicine, law, and cybersecurity, where misinformation can lead to severe consequences.
-
-To address this, Retrieval-Augmented Generation (RAG) is commonly used to supplement LLMs with external knowledge sources, improving factual accuracy by providing the LLM with context to generate from. While RAG enhances LLM performance, it also introduces new security risks. In particular, threat actors can exploit prompt injection attacks, in a similar fashion to LLMs, to manipulate retrieval outputs or extract sensitive data, which poses a significant privacy threat—especially in healthcare, where patient confidentiality is critical.
+To mitigate hallucinations, Retrieval-Augmented Generation (RAG) is commonly used to supplement LLMs with external knowledge sources, improving factual accuracy by providing the LLM with context. However, while RAG enhances LLM performance by grounding responses in external knowledge, it also introduces new security risks. In particular, threat actors can exploit prompt injection attacks, in a similar fashion to LLMs, to manipulate retrieval outputs or extract sensitive data, which poses a significant privacy threat — especially in healthcare, where patient confidentiality is critical.
 
 In this project, we explore an Agent-based synthetic document generation framework designed to mitigate these risks. By separating the RAG database from the externally facing LLM, we ensure the sensitive records are not directly exposed to the model. Instead, they undergo a controlled synthesis process. Only the necessary information is extracted from the retrieved knowledge, and any appearance of sensitive information such as names and ages are replaced with placeholders before being passed to the external LLM. This reduces the likelihood of data leakage while preserving response accuracy.
 
 In chapter \ref{introduction} we provide a brief description of a RAG system as well as briefly discuss applications of LLMs with RAG in healthcare.
+
+In chapter \ref{literature} we provide an overview of RAG vulnerabilities and discuss medical anonymization methods.
+
+In chapter \ref{methodology} we describe the methodology used in building the RAG corpus and pipeline, as well a formal description and outline of the synthetic document generation framework.
+
+In chapter \ref{results} we evaluate the node retrieval accuracy of the RAG pipeline, and use common metrics to evaluate the performance of the synthetic document generation framework.
+
+In chapter \ref{conclusion} we conclude by discussing possible future work and implementations based off this project.
 
 \section{Background}
 
@@ -32,7 +38,7 @@ Through RAG, an LLM becomes able to generate highly accurate, domain-specific in
 One application of RAG in healthcare is in diagnostic assistance, where LLMs match patient symptoms with medical knowledge retrieved from external sources. This enables more informed diagnoses while reducing the cognitive load on physicians. Furthermore, LLMs may be able to detect subtle symptom correlations that clinicians might overlook, improving early disease detection \autocite{jin2024healthllmpersonalizedretrievalaugmenteddisease}.
 
 
-While RAG brings many benefits, it comes with its own caveats. RAG systems remain susceptible to prompt attacks much like LLMs are. They can also become poisoned, where the RAG corpus becomes corrupted through the insertion of adversarial attack passages.
+Despite the benefits of RAG, it introduces vulnerabilities that must be addressed. RAG systems remain susceptible to prompt attacks much like LLMs are. They can also become poisoned, where the RAG corpus becomes corrupted through the insertion of adversarial attack passages.
 
 In chapter \ref{literature} we discuss more about the vulnerabilities that RAG systems have.
 

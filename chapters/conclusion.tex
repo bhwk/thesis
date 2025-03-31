@@ -1,0 +1,15 @@
+\chapter{Conclusion} \label{conclusion}
+
+\section{Future Work}
+
+\subsection{Leveraging Text-to-SQL RAG}
+As mentioned in chapter \ref{methodology}, the current system converts structured FHIR records into plain text documents. However, FHIR data is inherently structured, and is stored in relational databases such as SQL or PostgreSQL. Relational databases allow for precise querying through conditional filtering, which could improve retrieval accuracy. Future implementations could explore the use of a Text-to-SQL model, which can translate language queries into SQL statements, allowing for direct interaction with the database and eliminating the need for a vector database. This would require exploration into ensuring the validity and safety of the generated SQL queries to mitigate the risks of adversarial statements such as database deletion.
+
+\subsection{Embedding LLM-Generated Summaries}
+The system implemented in this project makes use of text documents generated for FHIR data.
+Future work could explore the use of LLMs to generated concise and structured summaries of patient information from these records.
+This could improve retrieval accuracy by reducing semantic overlap between repeated tokens across multiple files which would lead to more relevant results.
+Furthermore, the nature of the LLM-generated summary would align better with the model's tokenization process, which could facilitate enhanced information extraction during RAG.
+
+\subsection{Reconstruction of Original Data}
+This project does not explore the possibility of reconstructing the original information retrieved from the synthesized information. There have been studies done that perform linear reconstruction on synthetic data \autocite{annamalai2024linearreconstructionapproachattribute}, as well as reconstruction of user input using intermediate embeddings \autocite{zheng2023inputreconstructionattackvertical}. Future implementations could explore the feasibility of reconstructing the original context information using the synthesized information.
