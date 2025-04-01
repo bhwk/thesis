@@ -180,7 +180,7 @@ To allow the agent to make use of both semantic and keyword searches, we turn th
 Depending on the mode of retrieval, we run the query against either our vector index or keyword index and receive a set of nodes. Using the set of nodes, we make a call to the LLM to extract the necessary context information from the nodes and return the final result from the workflow.
 This is visually represented in figure \ref{fig:RagWorkflow}.
 
-\begin{figure}
+\begin{figure}[ht]
 	\centering
 	\includegraphics[width=\linewidth]{rag-workflow.png}
 	\caption{RAG workflow}
@@ -246,7 +246,7 @@ async def search_for_patients_with_medical_condition(
 Additionally we create functions that allow the agents to store any information they may retrieve or create during their part of the process. Each of these functions are attached to the corresponding agent depending on what type of information the function is recording.
 
 In each workflow, there is a global state represented by a Python dictionary.
-This global state is shared between the agents in the workflow, and can be modified using functions. In general the functions modify the global state by either appending to or overwriting the corresponding key in the global state dictionary.
+This global state is shared between the agents in the workflow, and can be modified using functions. The functions modify the global state by either appending to or overwriting the corresponding key in the global state dictionary.
 
 We record the following information in the global state: the nodes and information retrieved, the synthesized information and query, and finally the input query. The code used for recording the information extracted and retrieved by the RAG pipeline is shown in figure \ref{fig:InformationFunc} as an example. The rest of the functions can be referred to in the appendix.
 
