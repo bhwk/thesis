@@ -19,6 +19,7 @@
 \fancyfoot[C]{\thepage}
 
 \usepackage{titlesec}
+\usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{mathtools}
 \usepackage[
@@ -42,20 +43,12 @@
 
 \usepackage{tabularx}
 
-\title{
-  {Privacy Enhanced Retrieval-Augmented Generation (RAG) for Large Language Models in Healthcare}\\
-  {\large National University of Singapore}\\
-}
-\author{Bryan Ha Wai Kit}
-\date{2025}
-
-
 \bibliography{references.bib}
 
 
 \begin{document}
 \pagenumbering{roman}
-\maketitle
+\input{title.tex}
 
 \clearpage
 \addcontentsline{toc}{chapter}{Abstract}
@@ -84,5 +77,5 @@
 \break
 
 \appendix
-\input{chapters/appendix.tex}
+\input{chapters/appendix/appendix.tex}
 \end{document}

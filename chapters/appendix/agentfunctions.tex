@@ -1,0 +1,105 @@
+\chapter{Functions for Agents} \label{AgentFunctions}
+
+\begin{figure}[h]
+	\centering
+	\small
+	\begin{lstlisting}[language=Python, breaklines=true]
+async def record_information(ctx: Context, information: str) -> str:
+    """Useful for recording information for a given query. Your input should be information written in plain text."""
+    current_state = await ctx.get("state")
+    if "information" not in current_state:
+        current_state["information"] = []
+    current_state["information"].append(information)
+    await ctx.set("state", current_state)
+
+    return "Information recorded."
+    \end{lstlisting}
+	\caption{Information Function}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\small
+	\begin{lstlisting}[language=Python, breaklines=true]
+async def review_response(ctx: Context, review: str) -> str:
+    """Useful for reviewing a response and providing feedback. Your input should be a review of the report."""
+    current_state = await ctx.get("state")
+    if "review" not in current_state:
+        current_state["review"] = ""
+    current_state["review"] = review
+
+    await ctx.set("state", current_state)
+    return "Response reviewed."
+    \end{lstlisting}
+	\caption{Review Function}
+\end{figure}
+
+
+\begin{figure}[h]
+	\centering
+	\small
+	\begin{lstlisting}[language=Python, breaklines=true]
+async def synthesize_information(ctx: Context, synthesized_information: str) -> str:
+    """Useful for creating synthetic context from base information provided. Your input should be the synthesized information"""
+    current_state = await ctx.get("state")
+    if "synthesized_information" not in current_state:
+        current_state["synthesized_information"] = ""
+    current_state["synthesized_information"] = synthesized_information
+
+    await ctx.set("state", current_state)
+    return "Content generated."
+    \end{lstlisting}
+	\caption{Synthesize Information Function}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\small
+	\begin{lstlisting}[language=Python, breaklines=true]
+async def synthesize_query(ctx: Context, synth_query: str) -> str:
+    """Useful for creating a synth query based from the original query. Your input should be a generated, synthesized version of the user's query."""
+    current_state = await ctx.get("state")
+    if "synth_query" not in current_state:
+        current_state["synth_query"] = ""
+    current_state["synth_query"] = synth_query
+
+    await ctx.set("state", current_state)
+    return "Query generated."
+    \end{lstlisting}
+	\caption{Synthesize Query Function}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\small
+	\begin{lstlisting}[language=Python, breaklines=true]
+async def record_nodes(ctx: Context, nodes: list[NodeWithScore]) -> str:
+    """Useful for recording the nodes retrieved from a search. Your input should be the list of nodes retrieved"""
+    current_state = await ctx.get("state")
+    if "nodes" not in current_state:
+        current_state["nodes"] = []
+    current_state["nodes"].extend(nodes)
+
+    await ctx.set("state", current_state)
+    return "Nodes recorded"
+    \end{lstlisting}
+	\caption{Record Nodes Function}
+\end{figure}
+
+
+\begin{figure}[h]
+	\centering
+	\small
+	\begin{lstlisting}[language=Python, breaklines=true]
+async def generate_response(ctx: Context, response: str) -> str:
+    """Used to generate a response to a user's query using the information retrieved."""
+
+    current_state = await ctx.get("state")
+    current_state["response"] = response
+
+    await ctx.set("state", current_state)
+
+    return "Response written."
+    \end{lstlisting}
+	\caption{Generate Response Function}
+\end{figure}

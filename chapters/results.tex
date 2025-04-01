@@ -198,3 +198,5 @@ We use ROUGE-L score to evaluate if there is overlap between the response and th
 	\caption{Synthetic Document System and Single-agent ROUGE-L Scores}
 	\label{Tab:SynthSingleROUGE-L}
 \end{table}
+
+The ROUGE-L scores for both systems are found in Table \ref{Tab:SynthSingleROUGE-L}. We note that the ROUGE-L score for the synthetic document system (0.353) compared to the single-agent system (0.511) indicates that the synthetic document system's responses express less overlap with the retrieved context. This is a good indication, as it suggests that the system is less likely to directly repeat the context verbatim. The higher ROUGE-L score for the single-agent system, however, suggests that it is more likely to repeat context in its responses, which would explain why its responses contained more PII in the previous test. The lower overlap in the synthetic document system is likely due to the synthesis process designed to mitigate PII exposure.
