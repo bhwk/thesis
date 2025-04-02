@@ -46,12 +46,7 @@ We make use of the open-source library \textbf{Llamaindex} \autocite{Liu_LlamaIn
 
 First, we consider the type of data we wish to embed. JSON files are designed for programmatic use, meaning that they contain many identifying and delimiting tokens. If we were to convert the file in its entirety into its vector representation, it will result in detail being lost due to the repeated embedding of same key-value token pairs. Therefore, we first have to carry out flattening of the FHIR record.
 
-Flattening the FHIR involves two things. First, we must determine what type of information we wish to extract. For this project, we are only working with information from the Patient resource, as well as the Observation, Procedure, Condition, Allergy and MedicationRequest resources. While initially the Encounter resource was used, we decided that it did not add any type of substantial information apart from the reason of the encounter as well as the location where it took place. Secondly, we have to convert the selected information into basic sentences. This is done by recursively un-nesting the FHIR resource with the information we specified.
-
-The reason we do this is to improve the embedding accuracy of the FHIR record.
-Firstly, we convert FHIR resources to basic sentences.
-This is to avoid repeatedly embedding the same key-value token pairs and wasting embedding tokens.
-Refer to figure \ref{fig:FHIRtoSentence} for an example.
+Flattening the FHIR involves two things. First, we must determine what type of information we wish to extract. For this project, we are only working with information from the Patient resource, as well as the Observation, Procedure, Condition, Allergy and MedicationRequest resources. While initially the Encounter resource was used, we decided that it did not add any type of substantial information apart from the reason of the encounter as well as the location where it took place. Secondly, we have to convert the selected information into basic sentences. This is done by recursively un-nesting the FHIR resource with the information we specified. Refer to figure \ref{fig:FHIRtoSentence} for an example.
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{Converting FHIR to sentence.png}
@@ -141,8 +136,6 @@ Figure \ref{fig:AgentInteraction} outlines the flow of interactions between the 
 Upon receiving an input query, the Synthesis Agent passes off control to the Search Agent, which determines what kind of searches need to be run.
 
 There are two ways the Search Agent can carry out searches. First, it can carry out a semantic search using information from the query. Secondly, it can check for patients that have been diagnosed with a specific condition. The logic behind this is to enable the Search Agent to carry out general queries, such as searching for medications given to patients diagnosed with the same condition.
-
-At this stage, the Search Agent is also in charge of determining the right information to return. Here we make use of \textbf{Llamaindex's} implementation,  which consolidates smaller chunks into larger chunks that better fit the context window, refining the chunks sequantially untill all the chunks have been consumed.
 
 Finally, once the necessary information has been consolidated, we return it to the Synthesis Agent.
 

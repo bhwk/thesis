@@ -18,51 +18,29 @@ The following table presents the results for each case:
 
 \begin{table}
 	\centering
-	\begin{tabularx}{0.7\textwidth}
-		{
-			|  >{\raggedright\arraybackslash}X
-			|  >{\raggedright\arraybackslash}X
-			|  >{\raggedright\arraybackslash}X
-			|  >{\raggedright\arraybackslash}X |}
+	\begin{tabular}{|c|c|c|c|}
 		\hline
 		                  & \textit{k = 3} & \textit{k = 4} & \textit{k = 5} \\
 		\hline
 		Semantic (Hybrid) & 81.8           & 82.4           & 88             \\
+        \hline
+		Semantic (Non-hybrid) & 52             & 60.2           & 66.6           \\
 		\hline
 		Keyword           & 26.2           & 32.2           & 30.4           \\
 		\hline
 		Both              & 83.8           & 85.8           & 88             \\
 		\hline
-	\end{tabularx}
+	\end{tabular}
 	\caption{RAG Accuracy Comparison}
 	\label{Tab:RAGAccuracyComp}
 \end{table}
 
 
-As observed in table \ref{Tab:RAGAccuracyComp}, the keyword search performs the worst on its own. The cases where the semantic searches are present both perform similarly. This is most likely due to the two factors. First, the semantic searches used in this project are performing hybrid searches, meaning the search combines the results from both dense and sparse vectors. Dense vectors are vectors produced using text embedding models similar to the one used in this project. Sparse vectors are computed using different algorithms, such as BM25. We can consider it a combination of a traditional search alongside semantic search, as such it makes sense that the hybrid search method performs the best.
+As observed in table \ref{Tab:RAGAccuracyComp}, the keyword search performs the worst on its own. The cases where the hybrid semantic search is present both perform similarly. This is most likely due to the two factors. First, the semantic searches used in this project are performing hybrid searches, meaning the search combines the results from both dense and sparse vectors. Dense vectors are vectors produced using text embedding models similar to the one used in this project. Sparse vectors are computed using different algorithms, such as BM25. We can consider it a combination of a traditional search alongside semantic search, as such it makes sense that the hybrid search method performs the best.
 
 Secondly, since we generate questions using the file text as content, the LLM tends to use the file as contextual base and includes details such as dates and names, or quotes information that appears directly within the text. This could result in the semantic search results improving due to the similarities between the text and the query. Furthermore, regex keyword search is inherently limited, which will impact the results negatively.
 
-We also consider the performance of the non-hybrid semantic search in table \ref{Tab:NonHybridSemantic}. As expected, the accuracy of the non-hybrid semantic search decreases moderately. However, it does still perform better than the standalone keyword search.
-
-
-\begin{table}
-	\centering
-	\begin{tabularx}{0.7\textwidth}
-		{
-			|  >{\raggedright\arraybackslash}X
-			|  >{\raggedright\arraybackslash}X
-			|  >{\raggedright\arraybackslash}X
-			|  >{\raggedright\arraybackslash}X |}
-		\hline
-		                      & \textit{k = 3} & \textit{k = 4} & \textit{k = 5} \\
-		\hline
-		Semantic (Non-hybrid) & 52             & 60.2           & 66.6           \\
-		\hline
-	\end{tabularx}
-	\caption{Non-hybrid Semantic Search}
-	\label{Tab:NonHybridSemantic}
-\end{table}
+We also consider the performance of the non-hybrid semantic search. As expected, the accuracy of the non-hybrid semantic search decreases moderately. However, it does still perform better than the standalone keyword search.
 
 Furthermore, we note that the accuracy increases with \textit{k}, which is to be expected as more nodes are being retrieved. However, while the accuracy of the node retrieval does increase, it does not guarantee an improvement in the LLM's response. An increase in nodes retrieved will result in more information being added to the LLM's context window, which may cause it overlook critical information within the text that would answer the query.
 

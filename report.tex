@@ -45,14 +45,33 @@
 
 \bibliography{references.bib}
 
+\usepackage[acronym,toc,nonumberlist]{glossaries}
+\usepackage{glossaries-extra}
+
+\makenoidxglossaries
+
+\newacronym{llm}{LLM}{Large Language Model}
+\newacronym{rag}{RAG}{Retrieval-Augmented Generation}
+\newacronym{nlp}{NLP}{Natural Language Processing}
+\newacronym{pii}{PII}{Personally Identifiable Information}
+\newacronym{bleu}{BLEU}{Bilingual Evaluation Understudy}
+\newacronym{rouge}{ROUGE}{Recall-Oriented Understudy for Gisting Evaluation}
+\newacronym{json}{JSON}{JavaScript Object Notation}
+\newacronym{fhir}{FHIR}{Fast Healthcare Interoperability Resources}
+\glsaddall
+
 
 \begin{document}
 \pagenumbering{roman}
 \input{title.tex}
+\clearpage
 
 \clearpage
 \addcontentsline{toc}{chapter}{Abstract}
 \input{chapters/abstract.tex}
+\clearpage
+\addcontentsline{toc}{chapter}{Acknowledgments}
+\input{chapters/acknowledgement.tex}
 \clearpage
 \stepcounter{page}  % Ensures the next page gets a new Roman numeral
 
@@ -62,8 +81,10 @@
 \listoffigures
 \clearpage
 \listoftables
-
 \clearpage
+\printnoidxglossary[type=acronym, title={List of Abbreviations}]
+\clearpage
+
 \pagenumbering{arabic}
 \setcounter{page}{1}
 \input{chapters/intro.tex}
