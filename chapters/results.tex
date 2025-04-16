@@ -20,15 +20,17 @@ The following table presents the results for each case:
 	\centering
 	\begin{tabular}{|c|c|c|c|}
 		\hline
-		                  & \textit{k = 3} & \textit{k = 4} & \textit{k = 5} \\
+		\multicolumn{4}{|c|}{Retrieval Accuracy (\%)}                            \\
 		\hline
-		Semantic (Hybrid) & 81.8           & 82.4           & 88             \\
-        \hline
+		                      & \textit{k = 3} & \textit{k = 4} & \textit{k = 5} \\
+		\hline
+		Semantic (Hybrid)     & 81.8           & 82.4           & 88             \\
+		\hline
 		Semantic (Non-hybrid) & 52             & 60.2           & 66.6           \\
 		\hline
-		Keyword           & 26.2           & 32.2           & 30.4           \\
+		Keyword               & 26.2           & 32.2           & 30.4           \\
 		\hline
-		Both              & 83.8           & 85.8           & 88             \\
+		Both                  & 83.8           & 85.8           & 88             \\
 		\hline
 	\end{tabular}
 	\caption{RAG Accuracy Comparison}
@@ -74,16 +76,20 @@ We separate the results into two tables, table \ref{Tab:BLEUandROUGE} and table 
 			|  >{\raggedright\arraybackslash}X
 			|  >{\raggedright\arraybackslash}X |}
 		\hline
-		                                     & BLEU   & ROUGE-1 & ROUGE-2 & ROUGE-L \\
+		\multicolumn{5}{|c|}{Textual Overlap Scores (BLEU and  ROUGE) for Synthesized Components } \\
 		\hline
-		Synthesized Information              & 0.0913 & 0.416   & 0.258   & 0.353   \\
+		                     & BLEU   & ROUGE-1 & ROUGE-2 & ROUGE-L                                \\
 		\hline
-		Synthesized Query                    & 0.396  & 0.692   & 0.536   & 0.660   \\
+		Synthesized Info     & 0.0913 & 0.416   & 0.258   & 0.353                                  \\
 		\hline
-		Response with Synthesized components & 0.181  & 0.526   & 0.269   & 0.386   \\
+		Synthesized Query    & 0.396  & 0.692   & 0.536   & 0.660                                  \\
+		\hline
+		Synthesized Response & 0.181  & 0.526   & 0.269   & 0.386                                  \\
+		\hline
+		\multicolumn{5}{|c|}{\textit{Lower scores are better}}                                     \\
 		\hline
 	\end{tabularx}
-	\caption{BLEU and ROUGE scores}
+	\caption{Textual Overlap Scores (BLEU and ROUGE) for Synthesized Components}
 	\label{Tab:BLEUandROUGE}
 \end{table}
 
@@ -102,25 +108,26 @@ For the low BLEU and ROUGE scores for the response, this is likely due to the no
 			|  >{\raggedright\arraybackslash}X
 			|  >{\raggedright\arraybackslash}X
 			|  >{\raggedright\arraybackslash}X |}
+
 		\hline
-		                                     & BERT Precision & BERT Recall & BERT F1 & SemScore \\
+		\multicolumn{5}{|c|}{Semantic Similarity Scores for Synthesized Components} \\
 		\hline
-		Synthesized Information              & 0.3209         & -0.01135    & 0.1459  & 0.6793   \\
+		                     & BERT Precision & BERT Recall & BERT F1 & SemScore    \\
 		\hline
-		Synthesized Query                    & 0.6065         & 0.3515      & 0.4760  & 0.7698   \\
+		Synthesized Info     & 0.8855         & 0.8295      & 0.8558  & 0.6793      \\
 		\hline
-		Response with Synthesized components & 0.4290         & 0.3182      & 0.3728  & 0.7938   \\
+		Synthesized Query    & 0.9337         & 0.8907      & 0.9115  & 0.7698      \\
+		\hline
+		Synthesized Response & 0.9037         & 0.8851      & 0.8941  & 0.7938      \\
+		\hline
+		\multicolumn{5}{|c|}{\textit{Higher scores are better}}                     \\
 		\hline
 	\end{tabularx}
-	\caption{BERTScore and SemScore}
+	\caption{Semantic Similarity Scores (BERTScore and SemScore) for Synthesized Components}
 	\label{BERTandSem}
 \end{table}
 
-In table \ref{BERTandSem}, we observe that the BERT Precision, Recall, and F1 scores vary from poor to moderate. This is to be expected. BERTScore computes the sentence similarity using token-level cosine similarity and differences in word choice can result in lower token similarity, resulting in lower scores.
-
-We also observe that the recall rate for the synthesized information is negative. This is likely due to the modifications made to the information retrieved, as it means that less of the reference tokens, meaning the original information, is covered by the tokens in the synthetic information.
-
-In all cases we observe that the SemScore performs well. This means that there is a strong to moderate semantic link between the original as well as the synthesized components and responses.
+In table \ref{BERTandSem} we observe that in all cases the BERT and SemScore scores perform well. This shows that the system is effective in maintaining the semantic fidelity between the original information and the synthesized information.
 
 \section{
   PII Extraction Attacks
@@ -141,15 +148,17 @@ Since the questions generated from the list of names contain the first name of t
 In total we have \textbf{361} questions generated. We pass the list of questions to each system and collate the results. Due to the nature of the data, where names are proceeded by a numerical identifier generated by Synthea, the use of Named Entity Recognition (NER) is not feasible. Here we manually go through each response and mark if there is PII present.
 
 
-\begin{table}[h]
+\begin{table}[htp]
 	\centering
 	\begin{tabular}{|c |c |c |c|}
 		\hline
-		Responses          & PII & No PII & Empty \\
+		\multicolumn{4}{|c|}{361 PII Extraction queries}                \\
 		\hline
-		Single-agent       & 100 & 124    & 137   \\
+		                   & PII          & No PII       & Empty        \\
 		\hline
-		Synthetic Document & 5   & 356    & 0     \\
+		Single-agent       & 100 (27.7\%) & 124 (34.3\%) & 137 (38.0\%) \\
+		\hline
+		Synthetic Document & 5 (1.4\%)    & 356 (98.0\%) & 0 (0.0\%)    \\
 		\hline
 	\end{tabular}
 	\caption{Synthetic Document System and Single-agent Responses}
@@ -162,7 +171,7 @@ Comparing the two systems, we also observe that the synthetic document system ha
 
 We use ROUGE-L score to evaluate if there is overlap between the response and the information retrieved. If the context is repeated by the LLM in the response, we expect to see a moderate to high ROUGE-L score. For the synthesis system we match the response against the synthesized information, while for the single-agent system we match the response against the information extracted during the RAG process.
 
-\begin{table}
+\begin{table}[htp]
 	\centering
 	\begin{tabular}{|c | c|}
 		\hline

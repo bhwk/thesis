@@ -24,14 +24,14 @@ This results in the following consequence: When an LLM encounters a query about 
 
 Retrieval-augmented generation (RAG), first introduced by \autocite{lewis2021retrievalaugmentedgenerationknowledgeintensivenlp}, was developed to mitigate hallucinations by integrating an external knowledge base into the LLM's generation pipeline. This grounds the LLMs response using the retrieved knowledge, preventing speculative responses from the LLM when faced with tokens outside its training set.
 
-\begin{figure}
+RAG operates by retrieving relevant documents from an unstructured or structured vector database and providing them as context for response generation. To facilitate retrieval, documents are converted into vector representations using a text embedding model, which captures the semantic relations in text. When a query is presented to an LLM with a RAG system, the query undergoes the same text embedding process. The vectorized query is compared with the document vectors present in the database and those that have the highest similarity are returned to the LLM. This process is outlined in figure \ref{fig:RAGexample}
+
+\begin{figure}[htp]
 	\includegraphics[width=\textwidth]{Conventional RAG example.png}
 	\caption{Example of a Conventional RAG system}
 	\centering
 	\label{fig:RAGexample}
 \end{figure}
-
-RAG operates by retrieving relevant documents from an unstructured or structured vector database and providing them as context for response generation. To facilitate retrieval, documents are converted into vector representations using a text embedding model, which captures the semantic relations in text. When a query is presented to an LLM with a RAG system, the query undergoes the same text embedding process. The vectorized query is compared with the document vectors present in the database and those that have the highest similarity are returned to the LLM.
 
 Through RAG, an LLM becomes able to generate highly accurate, domain-specific information rather than rely on its pre-trained knowledge, allowing for flexible applications in various fields.
 

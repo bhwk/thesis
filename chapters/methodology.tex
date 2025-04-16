@@ -126,7 +126,7 @@ The prompts for each agent are available in appendix \ref{agent prompts}.
 
 Figure \ref{fig:AgentInteraction} outlines the flow of interactions between the different agents.
 
-\begin{figure}
+\begin{figure}[htp]
 	\centering
 	\includegraphics[width=\textwidth]{agent-workflow.png}
 	\caption{Agent Interaction Flow}
@@ -172,7 +172,7 @@ To allow the agent to make use of both semantic and keyword searches, we turn th
 Depending on the mode of retrieval, we run the query against either our vector index or keyword index and receive a set of nodes. Using the set of nodes, we make a call to the LLM to extract the necessary context information from the nodes and return the final result from the workflow.
 This is visually represented in figure \ref{fig:RagWorkflow}.
 
-\begin{figure}[ht]
+\begin{figure}[htp]
 	\centering
 	\includegraphics[width=\linewidth]{rag-workflow.png}
 	\caption{RAG workflow}
@@ -188,8 +188,9 @@ With the RAG workflow defined, we create two separate functions that call the wo
 
 Both the names of the functions as well their descriptors informs the agent of their purpose. As such, it necessitates their naming scheme, as well as the verbose descriptions attached with requirements as well as examples so that the agent does not attempt to predict what the function is used for.
 
-\begin{figure}[h]
+\begin{figure}[htp]
 	\centering
+	\small
 	\begin{lstlisting}[language=Python, breaklines=true]
 async def retrieve_medical_readings_for_patient(
     query: str,
@@ -212,7 +213,7 @@ async def retrieve_medical_readings_for_patient(
 	\label{fig:SemanticSearchFunc}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[htp]
 	\centering
 	\small
 	\begin{lstlisting}[language=Python, breaklines=true]
